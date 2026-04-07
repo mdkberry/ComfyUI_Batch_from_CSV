@@ -1,0 +1,7 @@
+positive,negative,ref_image_1,ref_image_2,video_file,shot_name
+"a man walking through the streets with a neutral expression looking straight ahead. camera tracks backward.
+","blurry, low quality, text, watermark",M:\AIMMS_Projects\project_DevilInTheWind\media\3\base_02.png,,S:\Comfyui_windows_portable\ComfyUI\output\DITW_01A_03A_glance_no_reaction_00001.mp4,DITW_01A_03A_glance_no_reaction
+"man walks past worked in a city street. he keeps a neutral expression looking straight ahead as he walks. camera tracks his motion following parallel to him walking.
+","blurry, low quality, text, watermark",M:\AIMMS_Projects\project_DevilInTheWind\media\4\base_01.png,,S:\Comfyui_windows_portable\ComfyUI\output\DITW_01A_04A_construction_site_00001.mp4,DITW_01A_04A_construction_site
+"a man walks along the embankment opposite Westminster in London. camera follows tracking him parallel.
+","blurry, low quality, text, watermark",M:\AIMMS_Projects\project_DevilInTheWind\media\26\base_01.png,,S:\Comfyui_windows_portable\ComfyUI\output\DITW_03A_06A_westminer_walk_00001.mp4,DITW_03A_06A_westminer_walk
