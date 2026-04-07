@@ -88,6 +88,10 @@ positive,negative,ref_image_1,ref_image_2,video_file,shot_name
 
 ## 🚀 How to Use (Batch Generation)
 
+<img width="945" height="513" alt="csv-to-batch" src="https://github.com/user-attachments/assets/2aabf2f9-f9a1-4bf0-a69d-df31d04993a2" />
+
+
+
 ### Step 1 — Add the node
 
 - Double-click the canvas → search for **"Batch from CSV"** (category: `Batch/CSV`).
