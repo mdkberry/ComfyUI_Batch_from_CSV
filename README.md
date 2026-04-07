@@ -128,6 +128,11 @@ positive,negative,ref_image_1,ref_image_2,video_file,shot_name
 
 ---
 
+## Credits
+
+This work was based on and inspired by https://github.com/TharindaMarasingha/ComfyUI-CSV-to-Prompt
+
 ## 📄 License
 
 MIT — free to use, modify, and share.
+
