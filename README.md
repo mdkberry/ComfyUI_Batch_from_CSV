@@ -149,11 +149,12 @@ Plug this into a **Show Any** node (from ComfyUI easy-use). Because Show Any sto
 
 | Problem | Fix |
 |---|---|
-| No CSV files in dropdown | Make sure your `.csv` is inside the `csv_files` folder, then click **Refresh** |
+| No CSV files in dropdown | Make sure your `.csv` is inside the `csv_files` folder, then click **Refresh** or press `R` to reload nodes inside comfyUI |
 | Image outputs are blank/black | Check the path in the CSV is correct and the file exists |
 | Video path warning in console | The path is returned as a string even if missing — check spelling |
-| Row not advancing | Ensure the seed is set to **increment**, not fixed |
+| Row not advancing | Ensure the seed is set to **increment**, not fixed or random |
 | `info` shows empty paths | Make sure the relevant columns exist in your CSV header row |
+| no outputs being made after first run | Make sure you have set the `seed` back to 1 to start over |
 
 ---
 
