@@ -1,0 +1,22 @@
+# Python cache and compiled files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual environment folders (just in case)
+venv/
+env/
+
+# OS-specific junk
+.DS_Store
+Thumbs.db
+
+# ComfyUI node-specific ignores
+# Ignore all CSV files except the example one
+csv/*.csv
+!csv/example_batch.csv
+
+# Ignore logs or temp files if they appear
+*.log
+*.tmp
