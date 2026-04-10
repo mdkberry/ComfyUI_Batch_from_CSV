@@ -155,6 +155,7 @@ Plug this into a **Show Any** node (from ComfyUI easy-use). Because Show Any sto
 | Row not advancing | Ensure the seed is set to **increment**, not fixed or random |
 | `info` shows empty paths | Make sure the relevant columns exist in your CSV header row |
 | no outputs being made after first run | Make sure you have set the `seed` back to 1 to start over |
+| Second runs are slow | You may need to offload models between batch runs to clear the memory. Either start then stop a different model workflow quickly to force models out of memory, or restart comfyUI between batch runs |
 
 ---
 
