@@ -35,9 +35,12 @@ Each row in the CSV represents one "shot" or generation job. The node reads one 
    ```
    ComfyUI/custom_nodes/
    ```
-2. Install from command prompt in that folder using `git clone https://github.com/mdkberry/ComfyUI_Batch_from_CSV`
-3. Restart ComfyUI.
-4. The node appears under **Batch/CSV → Batch from CSV 📋**.
+2. Install from command prompt in that folder using 
+```
+git clone https://github.com/mdkberry/ComfyUI_Batch_from_CSV
+```
+4. Restart ComfyUI.
+5. The node appears under **Batch/CSV → Batch from CSV 📋**.
 
 ### Via ComfyUI Manager
 
