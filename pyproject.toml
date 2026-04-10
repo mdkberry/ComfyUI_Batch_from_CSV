@@ -1,16 +1,8 @@
 [project]
 name = "ComfyUI_Batch_from_CSV"
-version = "1.0.0"
-description = "A ComfyUI custom node for batch workflow processing from CSV — supports prompts, two reference images (IMAGE tensors), a video file path, and a shot name string."
-readme = "README.md"
-license = { text = "MIT" }
-requires-python = ">=3.10"
-dependencies = []   # Pillow & torch are already present in any ComfyUI install
+version = "1.1.0"
+description = "Batch run ComfyUI workflows from a CSV file — prompts, reference images, video paths and shot names, one row per execution."
+license = {text = "MIT"}
 
 [project.urls]
-Homepage = "https://github.com/yourname/ComfyUI_Batch_from_CSV"
-
-[tool.comfy]
-PublisherId = "ComfyUI_Batch_from_CSV"
-DisplayName = "Batch from CSV"
-Icon = ""
+Repository = "https://github.com/mdkberry/ComfyUI_Batch_from_CSV"
