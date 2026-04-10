@@ -31,12 +31,13 @@ Each row in the CSV represents one "shot" or generation job. The node reads one 
 
 ### Manual (recommended)
 
-1. Copy the `ComfyUI_Batch_from_CSV` folder into your ComfyUI `custom_nodes` directory:
+1. CD into your ComfyUI `custom_nodes` directory:
    ```
-   ComfyUI/custom_nodes/ComfyUI_Batch_from_CSV/
+   ComfyUI/custom_nodes/
    ```
-2. Restart ComfyUI.
-3. The node appears under **Batch/CSV → Batch from CSV 📋**.
+2. Install from command prompt in that folder using `git clone https://github.com/mdkberry/ComfyUI_Batch_from_CSV`
+3. Restart ComfyUI.
+4. The node appears under **Batch/CSV → Batch from CSV 📋**.
 
 ### Via ComfyUI Manager
 
