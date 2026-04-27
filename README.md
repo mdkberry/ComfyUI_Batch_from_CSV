@@ -163,8 +163,8 @@ Choose your file from the `csv_file` dropdown. Click **Refresh** in the ComfyUI 
 
 ### Step 4 — Configure for batch
 
-1. On the **Batch from CSV** node, set the `seed` widget control to **increment**.
-2. In the ComfyUI menu set **Batch count** to the number of rows in your CSV.
+1. On the **Batch from CSV** node, set the `seed` widget control to **increment** and the seed to 1 _(starts at row below the header)_ .
+2. In the ComfyUI menu set **Batch count** to the number of rows in your CSV _(excluding column header)_ .
 3. Click **Queue Prompt** — ComfyUI will run once per row, automatically loading the next row each time.
 
 ---
@@ -173,11 +173,15 @@ Choose your file from the `csv_file` dropdown. Click **Refresh** in the ComfyUI 
 
 | Problem | Fix |
 |---------|-----|
-| No CSV files in dropdown | Make sure your `.csv` is inside `csv_files/`, then click **Refresh** |
+| No CSV files in dropdown | Make sure your `.csv` is inside `csv_files/`, then click **Refresh** or press R to reload nodes inside comfyUI  |
 | Image outputs are blank/black | Check the path in the CSV is correct and the file exists |
 | Video/audio path warning in console | The path is returned as a string even if missing — check spelling |
 | LoRA not loading | Confirm the full path is correct; the node returns the path as a string only |
 | Row not advancing | Ensure the seed is set to **increment**, not fixed |
+| Info shows empty paths | Make sure the relevant columns exist in your CSV header row |
+| No outputs being made after first run | Make sure you have set the seed back to 1 to start over |
+| Second runs are slow | You may need to offload models between batch runs to clear the memory. Either start then stop a different model workflow quickly to force models out of memory, or restart comfyUI between batch runs. |
+| OOMs cause failures | Try setting switches for ComfyUI to aid with avoiding OOMS during batch processing and add memory clearing features to the workflow at the end of runs |
 
 ---
 
