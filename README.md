@@ -5,6 +5,13 @@ Each row in the CSV represents one "shot" or generation job. The node reads one 
 
 ---
 
+Screenshot v2.0.3
+
+<img width="1842" height="921" alt="screenshot_connections_v2 0 3" src="https://github.com/user-attachments/assets/175497be-0583-4780-b032-e675227b2c39" />
+
+
+---
+
 ## ✨ Output Connectors
 
 | Output connector  | Type   | Description |
