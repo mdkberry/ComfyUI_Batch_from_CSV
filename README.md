@@ -16,7 +16,7 @@ Each row in the CSV represents one "shot" or generation job. The node reads one 
 
 <img width="1842" height="921" alt="screenshot_connections_v2 0 3" src="https://github.com/user-attachments/assets/175497be-0583-4780-b032-e675227b2c39" />
 
-_The above screenshot shows viable connections you can use and examples of connector outputs for reference. The actual node is on the left._
+_The above screenshot shows viable connections you can use and examples of connector outputs for reference. The actual node is on the left. It will load the rows from csv one at a time based on seed number relating to row number of the csv._
 
 ---
 
