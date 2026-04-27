@@ -57,7 +57,7 @@ _(Field names relate to [AIMMS Storyboard Management](https://markdkberry.com/so
 
 ## ✅ Key Features
 
-- **Auto-scan** — any `.csv` file dropped in the `csv_files` folder is picked up automatically.
+- **Auto-scan** — any `.csv` file dropped in the `csv_files` folder is picked up automatically _(press R to refresh nodes if ComfyUI is open)_ .
 - **Seed-driven batching** — set seed to *increment* and queue N runs to process N rows.
 - **Loop-safe** — if seed exceeds the number of rows the node wraps around.
 - **Graceful fallback** — missing image files produce a blank 64×64 black tensor (no crash); missing video/audio/LoRA paths log a warning and return the path string as-is.
