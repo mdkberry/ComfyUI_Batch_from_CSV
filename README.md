@@ -31,15 +31,15 @@ _(Field names relate to [AIMMS Storyboard Management](https://markdkberry.com/so
 | `shot_name`       | STRING | Label for the shot — use to rename your output file |
 | `colour_scheme`   | STRING | Optional colour palette description — concatenate into prompt in workflow |
 | `scene_context`   | STRING | Optional scene/environment description — concatenate into prompt in workflow |
-| `dialogue`        | STRING | Optional dialogue text — concatenate into prompt in workflow |
+| `dialogue`        | STRING | Optional dialogue text — concatenate into prompt in workflow e.g. VibeVoice, or add "quotes" if prompt driven |
 | `lora_1`          | COMBO  | LoRA name — wire directly into the **lora_name** input on a standard LoRA Loader node |
 | `lora_2`          | COMBO  | LoRA name — wire directly into a second LoRA Loader |
 | `lora_3`          | COMBO  | LoRA name — wire directly into a third LoRA Loader |
-| `ref_image_1`     | IMAGE  | First reference image loaded as a ComfyUI IMAGE tensor |
-| `ref_image_2`     | IMAGE  | Second reference image loaded as a ComfyUI IMAGE tensor |
-| `ref_image_3`     | IMAGE  | Third reference image loaded as a ComfyUI IMAGE tensor |
-| `video_file`      | STRING | Normalised path to your `.mp4` video file |
-| `audio_vo`        | STRING | Path to voice-over audio file (`.mp3`, `.m4a`, `.flac`, `.wav`) — plug into **Audio File Loader** path input |
+| `ref_image_1`     | IMAGE  | First reference image loaded as a ComfyUI IMAGE tensor e.g FF |
+| `ref_image_2`     | IMAGE  | Second reference image loaded as a ComfyUI IMAGE tensor e.g. MF |
+| `ref_image_3`     | IMAGE  | Third reference image loaded as a ComfyUI IMAGE tensor e.g. LF |
+| `video_file`      | STRING | Normalised path to your `.mp4` video file input for v2v based workflows |
+| `audio_vo`        | STRING | Path to voice-over/dialogue audio file (`.mp3`, `.m4a`, `.flac`, `.wav`) — plug into **Audio File Loader** path input |
 | `positive_image`  | STRING | Positive prompt text for image generation (t2i / i2i) |
 | `negative_image`  | STRING | Negative prompt text for image generation |
 | `positive_video`  | STRING | Positive prompt text for video generation (i2v / t2v / v2v) |
