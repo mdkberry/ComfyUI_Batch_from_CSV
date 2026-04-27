@@ -22,6 +22,8 @@ _The above screenshot shows viable connections you can use and examples of conne
 
 ## ✨ Output Connectors
 
+_(Field names relate to [AIMMS Storyboard Management](https://markdkberry.com/software/)  e.g. `shot_id` and `order_number`, but can be adapted as required for any csv use case)_
+
 | Output connector  | Type   | Description |
 |-------------------|--------|-------------|
 | `shot_id`         | STRING | Unique shot identifier |
