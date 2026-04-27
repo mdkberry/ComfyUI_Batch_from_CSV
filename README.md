@@ -70,9 +70,9 @@ _(Field names relate to [AIMMS Storyboard Management](https://markdkberry.com/so
 
 ### Manual (recommended)
 
-1. Copy the `ComfyUI_Batch_from_CSV` folder into your ComfyUI `custom_nodes` directory:
+1. For ComfyUI portable, git clone the `ComfyUI_Batch_from_CSV` folder into your ComfyUI `custom_nodes` directory:
    ```
-   ComfyUI/custom_nodes/ComfyUI_Batch_from_CSV/
+   ComfyUI/custom_nodes/git clone https://github.com/mdkberry/ComfyUI_Batch_from_CSV.git
    ```
 2. Restart ComfyUI.
 3. The node appears under **Batch/CSV → Batch from CSV 📋**.
