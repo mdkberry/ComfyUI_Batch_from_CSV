@@ -1,7 +1,7 @@
 [project]
 name = "ComfyUI_Batch_from_CSV"
-version = "1.1.0"
-description = "Batch run ComfyUI workflows from a CSV file — prompts, reference images, video paths and shot names, one row per execution."
+version = "2.0.0"
+description = "Batch run ComfyUI workflows from a CSV file — prompts, reference images, video paths, audio VO, LoRA paths and shot metadata, one row per execution."
 license = {text = "MIT"}
 
 [project.urls]

@@ -1,20 +1,44 @@
 """
 ComfyUI_Batch_from_CSV
-
 A custom ComfyUI node for batch processing workflows from a CSV file.
-
 Supports: prompts, three reference images (IMAGE), a video file path (STRING),
-a shot name (STRING), and a full-row info string (STRING) — all driven
-row-by-row via the seed widget.
+LoRA file paths (STRING), an audio VO file path (STRING), and various text
+fields — all driven row-by-row via the seed widget.
 
 CSV columns expected:
-    positive    - positive prompt text
-    negative    - negative prompt text
-    ref_image_1 - Windows path to a .png reference image
-    ref_image_2 - Windows path to a .png reference image
-    ref_image_3 - Windows path to a .png reference image
-    video_file  - Windows path to a .mp4 video file
-    shot_name   - string label used for output file naming
+
+  shot_id          - unique identifier for the shot (STRING)
+  order_number     - sort/execution order (STRING)
+  shot_name        - label for the shot / output file naming (STRING)
+
+  colour_scheme    - optional text describing colour palette (STRING)
+  scene_context    - optional scene/environment description text (STRING)
+  dialogue         - optional dialogue text (STRING)
+
+  lora_1           - LoRA name as ComfyUI expects it (relative path within loras/ folder,
+                     e.g. "LTX-23\ltx2.3-transition.safetensors") — plug into lora_name input
+  lora_2           - second LoRA name (STRING)
+  lora_3           - third LoRA name (STRING)
+
+  ref_image_1      - path to a reference image (IMAGE tensor)
+  ref_image_2      - path to a second reference image (IMAGE tensor)
+  ref_image_3      - path to a third reference image (IMAGE tensor)
+
+  video_file       - path to an .mp4 video file (STRING)
+
+  audio_vo         - path to a voice-over audio file — mp3/m4a/flac/wav (STRING)
+                     plug into an audio file loader node
+
+  positive_image   - positive prompt text for image generation (STRING)
+  negative_image   - negative prompt text for image generation (STRING)
+  positive_video   - positive prompt text for video generation (STRING)
+  negative_video   - negative prompt text for video generation (STRING)
+
+  NOTE on prompt usage:
+    positive_image / negative_image are used for t2i and i2i workflows.
+    positive_video / negative_video are used for i2v, t2v, v2v workflows.
+    colour_scheme, scene_context, dialogue are optional extra text fields
+    the user can concatenate themselves in the workflow.
 """
 
 import os
@@ -26,6 +50,9 @@ from PIL import Image
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
+
+AUDIO_EXTENSIONS = {".mp3", ".m4a", ".flac", ".wav"}
+
 
 def _csv_dir() -> str:
     """Return the absolute path to the csv_files folder inside this node."""
@@ -49,11 +76,51 @@ def _normalise_path(raw: str) -> str:
     return os.path.normpath(raw.strip()) if raw and raw.strip() else ""
 
 
+def _lora_relative_name(raw: str) -> str:
+    """
+    ComfyUI's LoRA loader 'lora_name' widget expects a path relative to the
+    ComfyUI models/loras/ folder — exactly as it appears in widgets_values,
+    e.g. "LTX-23\\ltx2.3-transition.safetensors".
+
+    This function accepts whatever the CSV contains (absolute path or already-
+    relative name) and returns the correctly trimmed relative form:
+
+      Absolute:  "M:\\...\\models\\loras\\LTX-23\\foo.safetensors"
+                 → "LTX-23\\foo.safetensors"
+      Already relative / bare name:  "LTX-23\\foo.safetensors"
+                 → "LTX-23\\foo.safetensors"   (unchanged)
+      Empty / blank → ""
+
+    The separator in the returned string always matches the OS convention so
+    ComfyUI can look it up in its internal model list on any platform.
+    """
+    if not raw or not raw.strip():
+        return ""
+
+    # Normalise separators to the OS style first
+    norm = os.path.normpath(raw.strip())
+
+    # Look for a 'loras' folder segment in the path and take everything after it.
+    # os.path.normpath uses os.sep, so split on that.
+    parts = norm.split(os.sep)
+    # Search from the right so we match the last 'loras' segment in the path
+    # (handles e.g. a user whose home dir happens to contain the word 'loras').
+    for i in range(len(parts) - 1, -1, -1):
+        if parts[i].lower() == "loras":
+            # Everything after the 'loras' segment
+            relative_parts = parts[i + 1:]
+            if relative_parts:
+                return os.path.join(*relative_parts)
+            break
+
+    # No 'loras' segment found — assume the value is already relative / a bare name
+    return norm
+
+
 def _load_image_as_tensor(path: str):
     """
-    Load a PNG (or any PIL-supported image) from *path* and return it as a
-    ComfyUI-style IMAGE tensor [1, H, W, 3] float32 in [0, 1].
-
+    Load a PNG/JPG/etc. from *path* and return it as a ComfyUI IMAGE tensor
+    [1, H, W, 3] float32 in [0, 1].
     Returns a 1×64×64 black image if the file is missing or unreadable.
     """
     norm = _normalise_path(path)
@@ -64,14 +131,33 @@ def _load_image_as_tensor(path: str):
             return torch.from_numpy(arr).unsqueeze(0)  # [1, H, W, 3]
         except Exception as e:
             print(f"[ComfyUI_Batch_from_CSV] WARNING: could not load image '{norm}': {e}")
-
-    # Fallback — 64×64 black image so downstream nodes don't crash
-    print(
-        f"[ComfyUI_Batch_from_CSV] WARNING: image not found or unreadable: '{path}'. "
-        "Returning blank placeholder."
-    )
+    if path and path.strip():
+        print(
+            f"[ComfyUI_Batch_from_CSV] WARNING: image not found or unreadable: '{path}'. "
+            "Returning blank placeholder."
+        )
     arr = np.zeros((64, 64, 3), dtype=np.float32)
     return torch.from_numpy(arr).unsqueeze(0)
+
+
+def _validate_audio_path(path: str) -> str:
+    """
+    Normalise and validate an audio file path.
+    Logs a warning if the file is missing or has an unexpected extension.
+    Returns the normalised path string regardless (empty string if input blank).
+    """
+    norm = _normalise_path(path)
+    if not norm:
+        return ""
+    ext = os.path.splitext(norm)[1].lower()
+    if ext not in AUDIO_EXTENSIONS:
+        print(
+            f"[ComfyUI_Batch_from_CSV] WARNING: audio_vo extension '{ext}' is not in "
+            f"expected set {AUDIO_EXTENSIONS}. Path returned as-is: '{norm}'"
+        )
+    if not os.path.isfile(norm):
+        print(f"[ComfyUI_Batch_from_CSV] WARNING: audio_vo file not found: '{norm}'")
+    return norm
 
 
 def _read_row(csv_filename: str, row_index: int) -> dict:
@@ -97,28 +183,12 @@ def _read_row(csv_filename: str, row_index: int) -> dict:
     return rows[idx]
 
 
-def _build_info_string(row: dict, row_index: int, csv_filename: str) -> str:
-    """
-    Build a human-readable summary of the entire row to pipe into a Show Any node.
-    This gets embedded in the PNG workflow metadata so you can inspect it later.
-    """
-    lines = [
-        f"=== Batch from CSV — Row {row_index} ({csv_filename}) ===",
-        f"shot_name  : {row.get('shot_name', '').strip()}",
-        f"positive   : {row.get('positive', '').strip()}",
-        f"negative   : {row.get('negative', '').strip()}",
-        f"ref_image_1: {row.get('ref_image_1', '').strip()}",
-        f"ref_image_2: {row.get('ref_image_2', '').strip()}",
-        f"ref_image_3: {row.get('ref_image_3', '').strip()}",
-        f"video_file : {row.get('video_file', '').strip()}",
-    ]
-    # Append any extra columns that may exist in the CSV but aren't listed above
-    known_keys = {"shot_name", "positive", "negative",
-                  "ref_image_1", "ref_image_2", "ref_image_3", "video_file"}
-    for key, value in row.items():
-        if key not in known_keys:
-            lines.append(f"{key:<11}: {str(value).strip()}")
-
+def _build_info(row: dict, row_index: int) -> str:
+    """Build a human-readable summary of the current row for debug/metadata embedding."""
+    lines = [f"Row index : {row_index}"]
+    for key, val in row.items():
+        if val and str(val).strip():
+            lines.append(f"{key:20s}: {str(val).strip()}")
     return "\n".join(lines)
 
 
@@ -132,29 +202,55 @@ class BatchFromCSV:
 
     Outputs
     -------
-    positive_string  STRING  – positive prompt
-    negative_string  STRING  – negative prompt
+    shot_id          STRING  – unique shot identifier
+    order_number     STRING  – execution order field
+    shot_name        STRING  – shot label for output file naming
+    colour_scheme    STRING  – colour palette description (optional, concatenate in workflow)
+    scene_context    STRING  – scene/environment description (optional)
+    dialogue         STRING  – dialogue text (optional)
+    lora_1           STRING  – path to LoRA 1 .safetensors (plug into LoRA loader path)
+    lora_2           STRING  – path to LoRA 2 .safetensors
+    lora_3           STRING  – path to LoRA 3 .safetensors
     ref_image_1      IMAGE   – first reference image tensor
     ref_image_2      IMAGE   – second reference image tensor
     ref_image_3      IMAGE   – third reference image tensor
     video_file       STRING  – normalised path to the video file
-    shot_name        STRING  – shot / clip label for output file naming
-    row_index        INT     – the actual row index that was loaded (useful for debugging)
-    info             STRING  – full row summary for Show Any node / PNG metadata
+    audio_vo         STRING  – path to VO audio file (mp3/m4a/flac/wav), plug into audio loader
+    positive_image   STRING  – positive prompt for image generation (t2i / i2i)
+    negative_image   STRING  – negative prompt for image generation
+    positive_video   STRING  – positive prompt for video generation (i2v / t2v / v2v)
+    negative_video   STRING  – negative prompt for video generation
+    row_index        INT     – the actual row that was loaded (useful for debugging)
+    info             STRING  – full row summary — pipe into a Show Any node
     """
 
     CATEGORY = "Batch/CSV"
     FUNCTION = "load_row"
 
-    RETURN_TYPES = ("STRING", "STRING", "IMAGE", "IMAGE", "IMAGE", "STRING", "STRING", "INT", "STRING")
+    # RETURN_TYPES is populated after class definition (see bottom of file)
+    # so that lora_1/2/3 use the live folder_paths lora list — which gives
+    # them a COMBO connector type that plugs into the LoRA Loader's lora_name.
+    RETURN_TYPES = None  # overwritten below
+
     RETURN_NAMES = (
-        "positive_string",
-        "negative_string",
+        "shot_id",
+        "order_number",
+        "shot_name",
+        "colour_scheme",
+        "scene_context",
+        "dialogue",
+        "lora_1",
+        "lora_2",
+        "lora_3",
         "ref_image_1",
         "ref_image_2",
         "ref_image_3",
         "video_file",
-        "shot_name",
+        "audio_vo",
+        "positive_image",
+        "negative_image",
+        "positive_video",
+        "negative_video",
         "row_index",
         "info",
     )
@@ -165,7 +261,15 @@ class BatchFromCSV:
         return {
             "required": {
                 "csv_file": (csv_files, {"default": csv_files[0]}),
-                "seed": ("INT", {"default": 0, "min": 0, "max": 0xFFFFFFFFFFFFFFFF}),
+                "seed": (
+                    "INT",
+                    {
+                        "default": 1,
+                        "min": 0,
+                        "max": 0xFFFFFFFFFFFFFFFF,
+                        "control_after_generate": "increment",
+                    },
+                ),
             }
         }
 
@@ -175,53 +279,132 @@ class BatchFromCSV:
         return float(seed)
 
     def load_row(self, csv_file: str, seed: int):
+        blank = torch.zeros(1, 64, 64, 3, dtype=torch.float32)
+
         if csv_file == "No CSV files found":
             print("[ComfyUI_Batch_from_CSV] ERROR: No CSV file selected or available.")
-            blank = torch.zeros(1, 64, 64, 3, dtype=torch.float32)
-            return ("", "", blank, blank, blank, "", "", 0, "No CSV file selected.")
+            return ("", "", "", "", "", "", "", "", "", blank, blank, blank,
+                    "", "", "", "", "", "", 0, "No CSV file loaded.")
 
         row = _read_row(csv_file, seed)
+
         if not row:
-            blank = torch.zeros(1, 64, 64, 3, dtype=torch.float32)
-            return ("", "", blank, blank, blank, "", "", seed, "Empty or unreadable CSV row.")
+            return ("", "", "", "", "", "", "", "", "", blank, blank, blank,
+                    "", "", "", "", "", "", seed, f"Row {seed}: empty or file not found.")
 
-        positive   = row.get("positive",    "").strip()
-        negative   = row.get("negative",    "").strip()
-        img1_path  = row.get("ref_image_1", "").strip()
-        img2_path  = row.get("ref_image_2", "").strip()
-        img3_path  = row.get("ref_image_3", "").strip()
-        video_path = _normalise_path(row.get("video_file", ""))
-        shot_name  = row.get("shot_name",   "").strip()
-        row_index  = seed  # exposed so users can pipe it for debugging
+        def g(key):
+            """Get a stripped string value from the row, defaulting to empty."""
+            return str(row.get(key, "") or "").strip()
 
-        ref_image_1 = _load_image_as_tensor(img1_path)
-        ref_image_2 = _load_image_as_tensor(img2_path)
-        ref_image_3 = _load_image_as_tensor(img3_path)
+        # Identity / metadata fields
+        shot_id      = g("shot_id")
+        order_number = g("order_number")
+        shot_name    = g("shot_name")
 
-        # Warn if video file is specified but missing
-        if video_path and not os.path.isfile(video_path):
-            print(f"[ComfyUI_Batch_from_CSV] WARNING: video file not found: '{video_path}'")
+        # Optional text fields (user concatenates these in workflow)
+        colour_scheme = g("colour_scheme")
+        scene_context = g("scene_context")
+        dialogue      = g("dialogue")
 
-        info = _build_info_string(row, seed, csv_file)
+        # LoRA names — returned as relative paths for ComfyUI's LoRA loader 'lora_name' input.
+        # ComfyUI expects the path relative to its models/loras/ folder (e.g. "LTX-23\foo.safetensors").
+        # _lora_relative_name() strips any absolute prefix up to and including the 'loras/' segment,
+        # and passes through values that are already relative / bare names unchanged.
+        lora_1 = _lora_relative_name(g("lora_1"))
+        lora_2 = _lora_relative_name(g("lora_2"))
+        lora_3 = _lora_relative_name(g("lora_3"))
+
+        # Reference images — loaded as ComfyUI IMAGE tensors
+        ref_image_1 = _load_image_as_tensor(g("ref_image_1"))
+        ref_image_2 = _load_image_as_tensor(g("ref_image_2"))
+        ref_image_3 = _load_image_as_tensor(g("ref_image_3"))
+
+        # Video path
+        video_file = _normalise_path(g("video_file"))
+        if video_file and not os.path.isfile(video_file):
+            print(f"[ComfyUI_Batch_from_CSV] WARNING: video_file not found: '{video_file}'")
+
+        # Audio VO path — validated for extension and existence
+        audio_vo = _validate_audio_path(g("audio_vo"))
+
+        # Prompt fields
+        positive_image = g("positive_image")
+        negative_image = g("negative_image")
+        positive_video = g("positive_video")
+        negative_video = g("negative_video")
+
+        row_index = seed  # exposed so users can pipe it for debugging
+        info = _build_info(row, seed)
 
         print(
             f"[ComfyUI_Batch_from_CSV] Loaded row {seed}: "
-            f"shot='{shot_name}' | video='{video_path}' | "
-            f"img1='{img1_path}' | img2='{img2_path}' | img3='{img3_path}'"
+            f"shot_id='{shot_id}' | shot_name='{shot_name}' | order='{order_number}' | "
+            f"video='{video_file}' | audio_vo='{audio_vo}' | "
+            f"lora_1='{lora_1}' | lora_2='{lora_2}' | lora_3='{lora_3}'"
         )
 
         return (
-            positive,
-            negative,
+            shot_id,
+            order_number,
+            shot_name,
+            colour_scheme,
+            scene_context,
+            dialogue,
+            lora_1,
+            lora_2,
+            lora_3,
             ref_image_1,
             ref_image_2,
             ref_image_3,
-            video_path,
-            shot_name,
+            video_file,
+            audio_vo,
+            positive_image,
+            negative_image,
+            positive_video,
+            negative_video,
             row_index,
             info,
         )
 
+
+# ---------------------------------------------------------------------------
+# Set RETURN_TYPES dynamically so lora_1/2/3 outputs carry the COMBO type
+# that ComfyUI's LoRA Loader expects on its lora_name input.
+#
+# A COMBO input/output in ComfyUI is identified by the *list object* itself —
+# not by the string "COMBO" or "STRING". The frontend checks connector
+# compatibility by comparing the type token: if both sides are lists, they
+# match as COMBO. So we must use the same list that folder_paths provides.
+# ---------------------------------------------------------------------------
+
+try:
+    import folder_paths as _fp
+    _loras = _fp.get_filename_list("loras")
+except Exception:
+    _loras = []
+
+BatchFromCSV.RETURN_TYPES = (
+    "STRING",  # shot_id
+    "STRING",  # order_number
+    "STRING",  # shot_name
+    "STRING",  # colour_scheme
+    "STRING",  # scene_context
+    "STRING",  # dialogue
+    _loras,    # lora_1  — COMBO, connects directly to LoRA Loader lora_name
+    _loras,    # lora_2
+    _loras,    # lora_3
+    "IMAGE",   # ref_image_1
+    "IMAGE",   # ref_image_2
+    "IMAGE",   # ref_image_3
+    "STRING",  # video_file
+    "STRING",  # audio_vo
+    "STRING",  # positive_image
+    "STRING",  # negative_image
+    "STRING",  # positive_video
+    "STRING",  # negative_video
+    "INT",     # row_index
+    "STRING",  # info
+)
 
 # ---------------------------------------------------------------------------
 # ComfyUI registration
