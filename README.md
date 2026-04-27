@@ -175,16 +175,16 @@ Choose your file from the `csv_file` dropdown. Click **Refresh** in the ComfyUI 
 ## Designed For Use with AIMMS Storyboard Management System
 
 Though this custom node will work with any csv provided the column headings and entries are correct format, it is specifically designed for use with [AIMMS Storyboard Management System](https://markdkberry.com/software/) in conjuction with ComfyUI.
-
-AIMMS screenshot of shot details page, showing popup entries for shot management:
+</br>
+_AIMMS screenshot of shot details page, showing popup entries for shot management:_
 
 <img width="1914" height="1076" alt="AIMMS_shot_details" src="https://github.com/user-attachments/assets/1e281f07-ffd1-4fa3-87fd-c9cc6906f54d" />
 
 </br>
-AIMMS screenshot of option to export shots to csv format that works directly with *ComyfUI_Batch_from_CSV* custom node. Copy the csv to the custom_node csv folder and load into ComfyUI for batch processing shots. 
+_AIMMS screenshot of option to export shots to csv format that works directly with *ComyfUI_Batch_from_CSV* custom node. Copy the csv to the custom_node csv folder and load into ComfyUI for batch processing shots._ 
 
 <img width="1916" height="1080" alt="AIMMS_export_to_csv" src="https://github.com/user-attachments/assets/4e9472a5-b5b1-4322-835b-7b278ebafef4" />
-
+</br>
 Future versions of *ComyfUI_Batch_from_CSV* custom node will feature direct integration to AIMMS project databases as an alternative to csv.
 
 ---
