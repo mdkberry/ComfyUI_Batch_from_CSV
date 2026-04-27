@@ -180,8 +180,8 @@ Choose your file from the `csv_file` dropdown. Click **Refresh** in the ComfyUI 
 | Row not advancing | Ensure the seed is set to **increment**, not fixed |
 | Info shows empty paths | Make sure the relevant columns exist in your CSV header row |
 | No outputs being made after first run | Make sure you have set the seed back to 1 to start over |
-| Second runs are slow | You may need to offload models between batch runs to clear the memory. Either start then stop a different model workflow quickly to force models out of memory, or restart comfyUI between batch runs. |
-| OOMs cause failures | Try setting switches for ComfyUI to aid with avoiding OOMS during batch processing and add memory clearing features to the workflow at the end of runs |
+| Second runs are slow | You may need to offload models between batch runs to clear the memory for VRAM and RAM |
+| OOMs cause failures | Try setting switches for ComfyUI to aid with avoiding OOMS during batch processing and add memory clearing features to the workflow at the end of runs. |
 
 ---
 
