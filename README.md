@@ -1,6 +1,6 @@
 # ComfyUI_Batch_from_CSV 📋
 
-***THIS IS IN THE PROCESS OF BEING UPDATED AND RENAMED. RECOMMENDED NOT TO INSTALL AT THIS TIME UNTIL THAT HAS HAPPENED. THIS MESSAGE WILL BE REMOVED IN A FEW DAYS WHEN UPDATES HAVE BEEN COMPLETED. IT NEEDS TO REMAIN PUBLICALLY ACCESSIBLE FOR LLM ACCESS UNTIL THEN - mdkberry, April 2026***
+***This was version 1, and might be of use to anyone wanting less complexity in the custom node, but be aware that if installing this one by updating to the later version the connector positions applied in workflows will not be honoured and will change position. I leave it here for anyone to use or adapt anyway. - mdkberry, April 2026***
 
 A custom ComfyUI node for **batch/bulk workflow processing** driven entirely from a CSV file.  
 Each row in the CSV represents one "shot" or generation job. The node reads one row per execution, making it perfect for automating large batches.
