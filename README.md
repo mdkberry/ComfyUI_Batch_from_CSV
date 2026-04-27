@@ -22,7 +22,7 @@ _The above screenshot shows viable connections you can use and examples of conne
 
 ## ✨ Output Connectors
 
-_(Field names relate to [AIMMS Storyboard Management](https://markdkberry.com/software/)  csv export feature, but can be adapted as required for any csv use case)_
+_(Field names relate to [AIMMS Storyboard Management](https://markdkberry.com/software/)  csv export feature)_
 
 | Output connector  | Type   | Description |
 |-------------------|--------|-------------|
