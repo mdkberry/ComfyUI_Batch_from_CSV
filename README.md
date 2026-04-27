@@ -181,7 +181,7 @@ Choose your file from the `csv_file` dropdown. Click **Refresh** in the ComfyUI 
 | Info shows empty paths | Make sure the relevant columns exist in your CSV header row |
 | No outputs being made after first run | Make sure you have set the seed back to 1 to start over |
 | Second runs are slow | You may need to offload models between batch runs to clear the memory for VRAM and RAM |
-| OOMs cause failures | Try setting switches for ComfyUI to aid with avoiding OOMS during batch processing and add memory clearing features to the workflow at the end of runs. |
+| OOMs cause failures | Try setting switches for ComfyUI to aid with avoiding OOMS during batch processing and add memory clearing features to the workflow. |
 
 ---
 
