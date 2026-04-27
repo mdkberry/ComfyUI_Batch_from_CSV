@@ -5,6 +5,13 @@ Each row in the CSV represents one "shot" or generation job. The node reads one 
 
 ---
 
+**Example csv row**:
+
+<img width="1860" height="115" alt="example-row-csv" src="https://github.com/user-attachments/assets/c902990c-c26e-4583-9d41-86e914439c1b" />
+
+
+---
+
 **Screenshot v2.0.3**
 
 <img width="1842" height="921" alt="screenshot_connections_v2 0 3" src="https://github.com/user-attachments/assets/175497be-0583-4780-b032-e675227b2c39" />
