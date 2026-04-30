@@ -1,6 +1,6 @@
 # ComfyUI_Batch_from_CSV 📋
 
-***NOTE: this is under test, so probably wait a few weeks and check back. Once this note disappears I have completed testing it. It should work though, last version did but this has extra features.*** - Mark, 27th April 2026.
+***NOTE: this is in development. I will update this note when its reached a satisfactory "release" point, but feel free to download it as it works well, I am really just tweaking the usefulness to work better with [AIMMS Storyboard Management Software](https://www.patreon.com/posts/aimms-license-156728576). Just be aware any updates could break older versions and you'll have to re-wire the connectors up again in previous workflows.*** - Mark, 1st May 2026.
 
 A custom ComfyUI node for **batch/bulk workflow processing** driven entirely from a CSV file.
 Each row in the CSV represents one "shot" or generation job. The node reads one row per execution, making it perfect for automating large batches across any workflow type — t2i, i2i, i2v, t2v, v2v, or anything else.
